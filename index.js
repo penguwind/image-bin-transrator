@@ -15,16 +15,27 @@ const influx = new Influx.InfluxDB({
             ]
         }
     ]
- })
+});
 
-const filenames = fs.readdirSync('./jpeg_files',);
-// console.log(filenames);
+let all_filenames = fs.readdirSync('./jpeg_files',);
+const filenames = [];
+const jpeg_other_delete = () =>{
+    for (let i = 0; i < all_filenames.length; i++){
+        const result = all_filenames[i].includes('.jpg', '.JPG', '.jpeg', '.JPEG', '.jpe', '.jfif', '.pjpeg', '.pjp');
+        if (result == true){
+            filenames.push(all_filenames[i]);
+        } else {
+            console.log('Remove non-JPEG files from the list');
+        }
+    };
+};
+jpeg_other_delete();
+console.log("result:" + filenames);
 
 const file_buffer = () => {
     const buffers = [];
     for (let i = 0; i < filenames.length; i++) {
         let text = fs.readFileSync( './jpeg_files/' + filenames[i] );
-        // console.log(filenames[i], text);
         buffers.push(text)
     }
     return buffers;
@@ -40,20 +51,19 @@ const save_buffers = async (buffers) =>{
             },
         ])
     }
-}
+};
 const buffers = file_buffer();
 // save_buffers(buffers);
 
 const gen_images = async () =>{
     const data = await influx.query('select * from jpeg_buffer')
-    // console.log(Object.keys(data[0]))
     for (const [i, item] of Object.entries(data)){
         if (typeof item.buffer === 'undefined'){
             continue
-        }
-        fs.writeFileSync(i + ".jpeg", Buffer.from(item.buffer, 'base64'))
-        console.log(Object.keys(item))
+        };
+        fs.writeFileSync(i + ".jpeg", Buffer.from(item.buffer, 'base64'));
+        console.log("DONE");
     }
-}
+};
 
 gen_images();
