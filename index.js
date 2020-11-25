@@ -41,19 +41,24 @@ const file_buffer = () => {
     return buffers;
 }
 
+var i = 0;
 const save_buffers = async (buffers) =>{
     for (const buffer of buffers){
+        // console.log(buffer[i]);
+        // console.log(i + "秒");
         await influx.writeMeasurement('jpeg_buffer', [
             {
             fields: {
-                buffer: buffer.toString('base64'),
+                buffer: buffer[i].toString('base64'),
             },
             },
         ])
+        if(i == buffers.length) clearInterval(id);
+        i++;
     }
 };
 const buffers = file_buffer();
-// save_buffers(buffers);
+var id = setInterval(save_buffers, 1000,[buffers]);
 
 const gen_images = async () =>{
     const data = await influx.query('select * from jpeg_buffer')
