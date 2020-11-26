@@ -46,6 +46,7 @@ const save_buffers = async (buffers) =>{
     for (const buffer of buffers){
         // console.log(buffer[i]);
         // console.log(i + "秒");
+        console.log(buffer[i])
         await influx.writeMeasurement('jpeg_buffer', [
             {
             fields: {
@@ -53,7 +54,7 @@ const save_buffers = async (buffers) =>{
             },
             },
         ])
-        if(i == buffers.length) clearInterval(id);
+        if(i == buffer.length - 1) clearInterval(id);
         i++;
     }
 };
@@ -71,4 +72,4 @@ const gen_images = async () =>{
     }
 };
 
-gen_images();
+// gen_images();
